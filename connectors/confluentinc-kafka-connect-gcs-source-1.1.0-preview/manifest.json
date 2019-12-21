@@ -1,0 +1,28 @@
+{
+  "name" : "kafka-connect-gcs-source",
+  "version" : "1.1.0-preview",
+  "title" : "Kafka Connect Google Cloud Storage",
+  "description" : "A Kafka Connect plugin for Google Cloud Storage",
+  "owner" : {
+    "username" : "confluentinc",
+    "name" : "Confluent, Inc."
+  },
+  "support" : {
+    "summary" : "Confluent is introducing this preview connector to gain early \nfeedback from developers. It should only be used for evaluation and non-production\ntesting purposes or to provide feedback to Confluent and is subject to the\n<a href=\"https://www.confluent.io/confluent-software-evaluation-license/\">\nConfluent Software Evaluation License.</a> Confluent will provide support for\nthis connector for evaluation and non-production testing purposes. Comments,\nquestions and suggestions related to preview features are encouraged. Confluent\ncustomers may submit questions and suggestions, and file support tickets via the\n<a href=\"https://support.confluent.io/\">Confluent Support Portal.</a>"
+  },
+  "tags" : [ "GCS", "Google Cloud Storage" ],
+  "features" : {
+    "supported_encodings" : [ "any" ],
+    "single_message_transforms" : true,
+    "confluent_control_center_integration" : true,
+    "kafka_connect_api" : true
+  },
+  "documentation_url" : "https://docs.confluent.io/current/connect/kafka-connect-gcs-source/",
+  "docker_image" : { },
+  "license" : [ {
+    "name" : "Confluent Software Evaluation License",
+    "url" : "https://www.confluent.io/software-evaluation-license"
+  } ],
+  "component_types" : [ "source" ],
+  "release_date" : "2019-10-24"
+}
