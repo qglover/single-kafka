@@ -4,7 +4,6 @@ zk-multiple-kafka-single/*
 zk-multiple-kafka-multiple/*
 full-stack/*
 .idea/
-env/
 avro-examples/
 connectorkeys/
 **.zip
