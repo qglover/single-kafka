@@ -11,8 +11,6 @@ connectorkeys/
 avroschemas/
 compose-files/
 streamingfiles/
-**.zip
-connectorkeys
 supportedconnectors/
 full-stack.yml
 LICENSE
