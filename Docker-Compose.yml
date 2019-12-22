@@ -10,6 +10,7 @@ services:
         ZOO_MY_ID: 1
         ZOO_PORT: 2181
         ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+        ZOO_LOG_LEVEL: WARN
     volumes:
       - ./zk-multiple-kafka-multiple/zoo1/data:/data
       - ./zk-multiple-kafka-multiple/zoo1/datalog:/datalog
@@ -23,6 +24,7 @@ services:
         ZOO_MY_ID: 2
         ZOO_PORT: 2182
         ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+        ZOO_LOG_LEVEL: WARN
     volumes:
       - ./zk-multiple-kafka-multiple/zoo2/data:/data
       - ./zk-multiple-kafka-multiple/zoo2/datalog:/datalog
@@ -36,6 +38,7 @@ services:
         ZOO_MY_ID: 3
         ZOO_PORT: 2183
         ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+        ZOO_LOG_LEVEL: WARN
     volumes:
       - ./zk-multiple-kafka-multiple/zoo3/data:/data
       - ./zk-multiple-kafka-multiple/zoo3/datalog:/datalog
@@ -49,12 +52,11 @@ services:
     env_file:
       - env/kafka.env
     environment:
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://192.168.99.100:9092
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${KAFKA_EXTERNAL_URL}:9092
       KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_HOST_NAME: kafka1
       KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka1 -Dcom.sun.management.jmxremote.rmi.port=1099"
 
-    volumes:
-      - ./zk-multiple-kafka-multiple/kafka1/data
     depends_on:
       - zoo1
       - zoo2
@@ -68,11 +70,11 @@ services:
     env_file:
       - env/kafka.env
     environment:
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka2:19093,LISTENER_DOCKER_EXTERNAL://192.168.99.100:9093
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka2:19093,LISTENER_DOCKER_EXTERNAL://${KAFKA_EXTERNAL_URL}:9093
       KAFKA_BROKER_ID: 2
+      KAFKA_ADVERTISED_HOST_NAME: kafka2
       KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka2 -Dcom.sun.management.jmxremote.rmi.port=1099"
-    volumes:
-      - ./zk-multiple-kafka-multiple/kafka2/data
+
     depends_on:
       - zoo1
       - zoo2
@@ -89,10 +91,9 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka3
       KAFKA_JMX_OPTS: -Djava.rmi.server.hostname=kafka3 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=1099 -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
-      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka3:19094,LISTENER_DOCKER_EXTERNAL://192.168.99.100:9094
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka3:19094,LISTENER_DOCKER_EXTERNAL://${KAFKA_EXTERNAL_URL}:9094
       KAFKA_BROKER_ID: 3
-    volumes:
-      - ./zk-multiple-kafka-multiple/kafka3/data
+
     depends_on:
       - zoo1
       - zoo2
@@ -113,7 +114,7 @@ services:
     ports:
       - "9000:9000"
     environment:
-      ZK_HOSTS: "192.168.99.100:2181"
+      ZK_HOSTS: "zoo1:2181"
     command: -Dpidfile.path=/dev/null
     depends_on:
       - zoo1
@@ -132,10 +133,15 @@ services:
       KSQL_BOOTSTRAP_SERVERS: PLAINTEXT://kafka1:19092
       KSQL_LISTENERS: http://0.0.0.0:8088/
       KSQL_KSQL_SERVICE_ID: ksql-server_
-      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      KSQL_KSQL_CONNECT_URL: http://kafka-connect:8083
+      #KSQL_KSQL_CONNECT_WORKER_CONFIG: "/usr/share/java/ksql-rest-app/kafkaconnect/worker.properties"
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+      KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
+      KSQL_KSQL_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+    volumes:
+      - ./kafkaconnect:/usr/share/java/ksql-rest-app/kafkaconnect
     depends_on:
       - zoo1
       - zoo2
@@ -199,7 +205,7 @@ services:
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_INTERNAL_VALUE_CONVERTER_SCHEMA_ENABLED: "false"
       CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
-      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "WARN"
       CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "3"
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "3"
@@ -252,6 +258,7 @@ services:
       - kafka3
       - kafka-schema-registry
 
+  #  docker-compose exec ksqldb-cli  ksql http://ksql-server:8088
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:latest
     container_name: ksqldb-cli
