@@ -2,7 +2,7 @@ version: '2.1'
 
 services:
   zoo1:
-    image: zookeeper:3.4.9
+    image: confluentinc/cp-zookeeper:${KAFKA_VERSION}
     hostname: zoo1
     ports:
       - "2181:2181"
@@ -11,12 +11,13 @@ services:
         ZOO_PORT: 2181
         ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
         ZOO_LOG_LEVEL: WARN
+        ZOOKEEPER_CLIENT_PORT: 2181
     volumes:
       - ./zk-multiple-kafka-multiple/zoo1/data:/data
       - ./zk-multiple-kafka-multiple/zoo1/datalog:/datalog
 
   zoo2:
-    image: zookeeper:3.4.9
+    image: confluentinc/cp-zookeeper:${KAFKA_VERSION}
     hostname: zoo2
     ports:
       - "2182:2182"
@@ -25,12 +26,13 @@ services:
         ZOO_PORT: 2182
         ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
         ZOO_LOG_LEVEL: WARN
+        ZOOKEEPER_CLIENT_PORT: 2181
     volumes:
       - ./zk-multiple-kafka-multiple/zoo2/data:/data
       - ./zk-multiple-kafka-multiple/zoo2/datalog:/datalog
 
   zoo3:
-    image: zookeeper:3.4.9
+    image: confluentinc/cp-zookeeper:${KAFKA_VERSION}
     hostname: zoo3
     ports:
       - "2183:2183"
@@ -39,13 +41,14 @@ services:
         ZOO_PORT: 2183
         ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
         ZOO_LOG_LEVEL: WARN
+        ZOOKEEPER_CLIENT_PORT: 2181
     volumes:
       - ./zk-multiple-kafka-multiple/zoo3/data:/data
       - ./zk-multiple-kafka-multiple/zoo3/datalog:/datalog
 
 
   kafka1:
-    image: confluentinc/cp-kafka:5.3.1
+    image: confluentinc/cp-kafka:${KAFKA_VERSION}
     hostname: kafka1
     ports:
       - "9092:9092"
@@ -63,7 +66,7 @@ services:
       - zoo3
 
   kafka2:
-    image: confluentinc/cp-kafka:5.3.1
+    image: confluentinc/cp-kafka:${KAFKA_VERSION}
     hostname: kafka2
     ports:
       - "9093:9093"
@@ -81,7 +84,7 @@ services:
       - zoo3
 
   kafka3:
-    image: confluentinc/cp-kafka:5.3.1
+    image: confluentinc/cp-kafka:${KAFKA_VERSION}
     hostname: kafka3
     ports:
       - "9094:9094"
